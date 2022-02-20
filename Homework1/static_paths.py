@@ -1,6 +1,6 @@
 import json
 
-from Responose import generate_response
+from responose import generate_response
 from router import Route
 
 def add_paths(router):
