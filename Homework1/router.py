@@ -44,6 +44,5 @@ class Route:
 
 
 def Error(request, handler):
-    print('Here')
     response = generate_response('404\nCannot Find Page'.encode(),'text/plain; charset=utf-8','404 Error')
     handler.request.sendall(response)

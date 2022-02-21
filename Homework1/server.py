@@ -6,6 +6,7 @@ import os
 from router import Router
 from request import Request
 from static_paths import add_paths
+from user_path import add_paths as path_user
 
 
 
@@ -17,6 +18,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     def __init__(self, request, client_address, server):
         self.router = Router()
         add_paths(self.router)
+        path_user(self.router)
         super().__init__(request, client_address, server)
 
     

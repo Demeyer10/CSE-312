@@ -1,7 +1,11 @@
+import json
+
 class Request:
 
     def __init__(self, data):
-        self.parsed_data = (data.decode()).split(' ')
-        self.method = self.parsed_data[0]
-        self.path = self.parsed_data[1]
+        self.parsed_data = (data.decode()).split('\r\n')
+        self.parse_method_path = self.parsed_data[0].split(' ')
+        self.method = self.parse_method_path[0]
+        self.path = self.parse_method_path[1]
+        self.body = json.loads(self.parsed_data[10])
         
