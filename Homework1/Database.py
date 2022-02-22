@@ -20,4 +20,12 @@ def get_new_id():
 
 def create(body):
         user_collection.insert_one(body)
-        print(body)
+        body.pop('_id')
+
+def all_users():
+        users_list = user_collection.find({} ,{"_id": 0})
+        return list(users_list)
+
+def get_user(id):
+        user = user_collection.find({"id": id}, {"_id": 0})
+        return list(user)
