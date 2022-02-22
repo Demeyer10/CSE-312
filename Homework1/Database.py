@@ -29,3 +29,6 @@ def all_users():
 def get_user(id):
         user = user_collection.find({"id": id}, {"_id": 0})
         return list(user)
+
+def update_user(id, body):
+        user_collection.update_one({"id": id},{'$set': {'email': body['email'], 'username': body['username']}})
