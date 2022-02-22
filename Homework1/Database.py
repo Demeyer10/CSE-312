@@ -32,3 +32,13 @@ def get_user(id):
 
 def update_user(id, body):
         user_collection.update_one({"id": id},{'$set': {'email': body['email'], 'username': body['username']}})
+
+def delete_user(id):
+        user_collection.delete_one({"id": id})
+
+def check_database(id):
+        user = get_user(id)
+        if not len(user):
+                return True
+        else:
+                return False

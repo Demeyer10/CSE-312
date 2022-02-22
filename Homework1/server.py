@@ -24,10 +24,9 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
     
     def handle(self):
 
-        received_data = self.request.recv(2048)
-        print('--Data Recieved--\n\n' 
-        + received_data.decode() + 
-        '\n\n--End of Data--')
+        received_data = self.request.recv(1024)
+        print('--Data Recieved--\n\n' + received_data.decode() + '\n\n--End of Data--')
+        
         sys.stdout.flush()
         sys.stdout.flush()
 
