@@ -8,11 +8,11 @@ from router import Route, Error
 import database as db
 
 def add_paths(router):
-    router.add_route(Route("POST", "/user", create_user))
-    router.add_route(Route("GET", "/user$", all_users))
-    router.add_route(Route("GET", "/user/[0-9]+$", retrieve_user))
-    router.add_route(Route("PUT", "/user/[0-9]+$", update_user))
-    router.add_route(Route("DELETE", "/user/[0-9]+$", delete_user))
+    router.add_route(Route("POST", "/users", create_user))
+    router.add_route(Route("GET", "/users$", all_users))
+    router.add_route(Route("GET", "/users/[0-9]+$", retrieve_user))
+    router.add_route(Route("PUT", "/users/[0-9]+$", update_user))
+    router.add_route(Route("DELETE", "/users/[0-9]+$", delete_user))
     
 
 
@@ -28,7 +28,7 @@ def all_users(request, handler):
     if not len(user_list):
         Error(request, handler, "404\nNo User in Database")
         return
-    response = generate_response(str(user_list).encode(), "text/plain", "200 OK")
+    response = generate_response(json.dumps(user_list).encode(), "text/plain", "200 OK")
     handler.request.sendall(response)
 
 
