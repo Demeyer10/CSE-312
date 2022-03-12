@@ -13,12 +13,31 @@
 </p>
 
 <p>
-    Here's a flamingo:
+    Here's a {{image_name}}:
 </p>
 
-<img src="image/flamingo.jpg" alt="It's a flamingo" class="my_image"/>
+<img src="./image/{{image_filename}}" alt="It's a {{image_name}}" class="my_image"/>
 
-
+<br/><br/>
 <script src="functions.js"></script>
+
+<form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
+    <label for="image-form-comment">Comment: </label>
+    <textarea id="image-form-comment" name="comment" cols="40" rows="6"></textarea>
+    <br/>
+    <label for="form-file">Image: </label>
+    <input id="form-file" type="file" name="upload">
+    <input type="submit" value="Post">
+ </form>
+
+ <br/><br/>
+ Messages:
+ {{loop}}
+ <b style= "margin-left: 4%;">{{message}}</b><br/>
+ {{end_loop}}
+
+ <br/>
+ <hr/>
+
 </body>
 </html>

@@ -28,7 +28,7 @@ def all_users(request, handler):
     if not len(user_list):
         Error(request, handler, "404\nNo User in Database")
         return
-    response = generate_response(json.dumps(user_list).encode(), "text/plain", "200 OK")
+    response = generate_response(json.dumps(user_list).encode(), "application/json", "200 OK")
     handler.request.sendall(response)
 
 
