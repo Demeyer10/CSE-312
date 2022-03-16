@@ -15,15 +15,17 @@ def add_paths(router):
     router.add_route(Route("GET", "/$", home))
     router.add_route(Route("POST", "/image-upload", upload))
    
-    
-message = [{"message": ""}]
-uploaded_content = {"image_name" : "uploaded content", "image_filename": "image1.jpg", "loop_data": message}
+message = [{"message": "", "image_file": ""}]
+base_content = {"loop_data": message}
 
 # Generate response based on the request
 def home(request, handler):
-    
-    content = render_template("sample_page/index.html", uploaded_content)
-
+    chat_list = db.get_chat()
+    if len(chat_list):
+        upload_data = {"loop_data": chat_list}
+        content = render_template("sample_page/index.html", upload_data)
+    else:
+        content = render_template("sample_page/index.html", base_content)
     response = generate_response(content.encode(), "text/html; charset=utf-8", "200 OK")
     handler.request.sendall(response)
 
@@ -51,10 +53,14 @@ def images(request, handler):
     handler.request.sendall(response)
     
 def upload(request, handler):
-    imageFile = open("./sample_page/image/dog.jpg", "wb")
-    imageFile.write(request.upload)
-    imageFile.close()
-    message.append({"message": request.comment.decode()})
+    image_file_name = ""
+    if request.upload != b'':
+        image_id = db.get_new_image_id()
+        image_file_name = "image" + str(image_id) + ".jpg"
+        image_file = open("./sample_page/image/" + image_file_name, "wb")
+        image_file.write(request.upload)
+        image_file.close()
+    db.save_upload(image_file_name, request.comment)
     handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /\r\n'.encode())
 
 

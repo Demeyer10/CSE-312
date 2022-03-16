@@ -46,6 +46,9 @@ def parse_additional_content(boundary: bytes, body: bytes):
         headers = parse_headers(headers)
         if headers["Content-Disposition"].split(';')[1].split("=")[1] == '"comment"':
             comment = content_body
+            comment = comment.replace(b'&', b'&amp;')
+            comment = comment.replace(b'>', b'&gt;')
+            comment = comment.replace(b'<', b'&lt;')
         elif headers["Content-Disposition"].split(';')[1].split("=")[1] == '"upload"':
             upload = content_body
     return [comment[:-2:], upload[:-2:]]

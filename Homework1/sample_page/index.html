@@ -13,10 +13,10 @@
 </p>
 
 <p>
-    Here's a {{image_name}}:
+    Here's a kitten:
 </p>
 
-<img src="./image/{{image_filename}}" alt="It's a {{image_name}}" class="my_image"/>
+<img src="image/kitten.jpg" alt="It's a kitten" class="my_image"/>
 
 <br/><br/>
 <script src="functions.js"></script>
@@ -33,11 +33,12 @@
  <br/><br/>
  Messages:
  {{loop}}
- <b style= "margin-left: 4%;">{{message}}</b><br/>
- {{end_loop}}
+<div style="width: 30%; flex-grow: 1; word-wrap: break-word;">
+<hr/>
+<p><b>{{message}}</b><br/>{{image_file}}</p>
+</div>
 
- <br/>
- <hr/>
+ {{end_loop}}
 
 </body>
 </html>

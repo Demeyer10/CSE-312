@@ -41,6 +41,6 @@ def buffer(content_length, self):
     
         
 if __name__ == "__main__":
-    HOST, PORT = "0.0.0.0", 8000
+    HOST, PORT = "0.0.0.0", 8080
     server = socketserver.ThreadingTCPServer((HOST,PORT), MyTCPHandler)
     server.serve_forever()
