@@ -8,7 +8,8 @@ class Request:
         self.headers = parse_headers(header_as_bytes)
         if "Content-Type" in self.headers:
             self.boundary = parse_boundary(self.headers)
-            [self.comment, self.upload] = parse_additional_content(self.boundary, self.body)
+            [self.comment, self.upload, self.token] = parse_additional_content(self.boundary, self.body)
+            print(self.token)
 
 def split_request(request: bytes):
     new_line_boundary = request.find(Request.new_line)
@@ -41,6 +42,7 @@ def parse_additional_content(boundary: bytes, body: bytes):
     content = body.split(boundary)
     comment = b''
     upload = b''
+    token = b''
     for i in range(1,len(content)-1):
         [request_line, headers, content_body] = split_request(content[i])
         headers = parse_headers(headers)
@@ -51,4 +53,6 @@ def parse_additional_content(boundary: bytes, body: bytes):
             comment = comment.replace(b'<', b'&lt;')
         elif headers["Content-Disposition"].split(';')[1].split("=")[1] == '"upload"':
             upload = content_body
-    return [comment[:-2:], upload[:-2:]]
+        elif headers["Content-Disposition"].split(';')[1].split("=")[1] == '"token"':
+            token = content_body
+    return [comment[:-2:], upload[:-2:], token[:-2:]]

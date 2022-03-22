@@ -1,9 +1,10 @@
 import json
 import os
+import secrets
 import database as db
 from responose import generate_response
 from router import Route
-from template_engine import render_template
+from template_engine import render_template, replace_placeholder
 
 def add_paths(router):
     # All allowed static paths (All other paths go to a 404 Error)
@@ -17,6 +18,7 @@ def add_paths(router):
    
 message = [{"message": "", "image_file": ""}]
 base_content = {"loop_data": message}
+tokens = []
 
 # Generate response based on the request
 def home(request, handler):
@@ -24,8 +26,14 @@ def home(request, handler):
     if len(chat_list):
         upload_data = {"loop_data": chat_list}
         content = render_template("sample_page/index.html", upload_data)
+        token = secrets.token_urlsafe(20)
+        tokens.append(token.encode())
+        content = content.replace("{{token}}", token)
     else:
+        token = secrets.token_urlsafe(20)
+        tokens.append(token.encode())
         content = render_template("sample_page/index.html", base_content)
+        content = content.replace("{{token}}", token)
     response = generate_response(content.encode(), "text/html; charset=utf-8", "200 OK")
     handler.request.sendall(response)
 
@@ -54,6 +62,12 @@ def images(request, handler):
     
 def upload(request, handler):
     image_file_name = ""
+    if request.token not in tokens:
+        handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /\r\n'.encode())
+        return
+    elif request.upload == b'' and request.comment == b'':
+        handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /\r\n'.encode())
+        return
     if request.upload != b'':
         image_id = db.get_new_image_id()
         image_file_name = "image" + str(image_id) + ".jpg"
