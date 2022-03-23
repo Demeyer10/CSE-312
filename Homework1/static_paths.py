@@ -63,7 +63,8 @@ def images(request, handler):
 def upload(request, handler):
     image_file_name = ""
     if request.token not in tokens:
-        handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /\r\n'.encode())
+        response = generate_response('Response Rejected'.encode(), "text/plain; charset=utf-8", "403 REJECTED")
+        handler.request.sendall(response)
         return
     elif request.upload == b'' and request.comment == b'':
         handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /\r\n'.encode())
