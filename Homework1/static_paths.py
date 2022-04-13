@@ -48,7 +48,7 @@ def style(request, handler):
     send_response('sample_page/style.css', 'text/css; charset=utf-8', request, handler)
 
 def js(request, handler):
-    send_response('sample_page/functions.js', 'text/js; charset=utf-8', request, handler)
+    send_response('sample_page/functions.js', 'text/javascript; charset=utf-8', request, handler)
 
 def images(request, handler):
     data = request.path.split('/')

@@ -6,3 +6,11 @@ def generate_response(body: bytes, content_type: str = "text/plain; charset=utf-
     response += b'\r\n\r\n'
     response += body
     return response
+
+def generate_websocket_response(websocket_key: bytes):
+    response = b'HTTP/1.1 101 Switching Protocols'
+    response += b'\r\nUpgrade: websocket'
+    response += b'\r\nConnection: Upgrade'
+    response += b'\r\nSec-WebSocket-Accept: ' + websocket_key
+    response += b'\r\n\r\n'
+    return response

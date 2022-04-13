@@ -1,45 +1,70 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>CSE312 Sample Front End</title>
-    <link rel="stylesheet" type="text/css" href="style.css"/>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+
 </head>
+
 <body onload="welcome();">
 
-<h1>CSE312 Sample Page</h1>
+    <h1>CSE312 Sample Page</h1>
 
-<p id="paragraph">
-    This text is from the HTML file 🙂
-</p>
+    <p id="paragraph">
+        This text is from the HTML file 🙂
+    </p>
 
-<p>
-    Here's a kitten:
-</p>
+    <p>
+        Here's a kitten:
+    </p>
 
-<img src="image/kitten.jpg" alt="It's a kitten" class="my_image"/>
+    <img src="image/kitten.jpg" alt="It's a kitten" class="my_image" />
 
-<br/><br/>
-<script src="functions.js"></script>
+    <br /><br />
 
-<form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
-    <label for="image-form-comment">Comment: </label>
-    <textarea id="image-form-comment" name="comment" cols="40" rows="6"></textarea>
-    <input id="from-token" name="token" type="hidden" value="{{token}}">
-    <br/>
-    <label for="form-file">Image: </label>
-    <input id="form-file" type="file" name="upload">
-    <input type="submit" value="Post">
- </form>
 
- <br/><br/>
- Messages:
- {{loop}}
-<div style="width: 30%; flex-grow: 1; word-wrap: break-word;">
-<hr/>
-<p><b>{{message}}</b><br/>{{image_file}}</p>
-</div>
+    <form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
+        <label for="image-form-comment">Comment: </label>
+        <textarea id="image-form-comment" name="comment" cols="40" rows="6"></textarea>
+        <input id="from-token" name="token" type="hidden" value="{{token}}">
+        <br />
+        <label for="form-file">Image: </label>
+        <input id="form-file" type="file" name="upload">
+        <input type="submit" value="Post">
+    </form>
 
- {{end_loop}}
 
+
+    <br /><br />
+    <label for="chat-comment">Chat: </label>
+    <input id="chat-comment" type="text" name="comment">
+
+    <button onclick="sendMessage()">Send</button>
+
+    <div id="chat"></div>
+
+    <br />
+    <button onclick="startVideo()">Start My Video</button>
+    <br />
+    <button onclick="connectWebRTC()">Start Video Chat</button>
+    <br />
+
+    <video id="myVideo" autoplay muted></video>
+    <br />
+    <video id="otherVideo" autoplay></video>
+
+
+    <br /><br />
+    Messages:
+    {{loop}}
+    <div style="width: 30%; flex-grow: 1; word-wrap: break-word;">
+        <hr />
+        <p><b>{{message}}</b><br />{{image_file}}</p>
+    </div>
+
+    {{end_loop}}
+    <script src="functions.js"></script>
 </body>
+
 </html>
