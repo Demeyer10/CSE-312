@@ -7,15 +7,16 @@ import random
 
 from frame_engine import unmask_data, decode_data, bit_frame, decode_frame_packet, build_frame_packet
 from buffer_engine import buffer
-from router import Route
+from router import Route, Error
 import database as db
-from responose import generate_websocket_response
+from responose import generate_websocket_response, generate_response
 
 
 
 
 def add_paths(router):
     router.add_route(Route("GET", "/websocket", upgrade_websocket))
+    router.add_route(Route("GET", "/chat-history", chatHistory))
 
 
 def upgrade_websocket(request, handler):
@@ -29,7 +30,6 @@ def upgrade_websocket(request, handler):
 def run_connection(request, handler):
     while True:
         received_data = handler.request.recv(1024)
-        print(received_data)
         if received_data != b'':
             sys.stdout.flush()
             sys.stderr.flush()
@@ -46,6 +46,7 @@ def run_connection(request, handler):
                 packet["DATA"] = decode_data(packet["DATA"])
             else:
                 packet["DATA"] = decode_data(packet["DATA"])
+            db.save_live_chat(handler.websocket_connection[handler], packet["DATA"])
             for users in handler.websocket_connection.keys():
                 users.request.sendall(build_frame_packet(packet, handler))
 
@@ -54,6 +55,14 @@ def compute_websocket_key(key):
     result = hashlib.sha1(key.encode())
     result = base64.b64encode(result.digest())
     return result
+
+def chatHistory(request, handler):
+    live_chat = db.get_live_chat()
+    response = generate_response(json.dumps(live_chat).encode(), "application/json", "200 OK")
+    handler.request.sendall(response)
+    
+    
+
 
 
 

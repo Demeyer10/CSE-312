@@ -73,7 +73,6 @@ def decode_data(data):
         decoded_data += single_data
         start_idx += 8
         end_idx += 8
-    print(decoded_data)
     return json.loads(decoded_data)
 
 def compute_payload_packet(payload_length, frame):
@@ -108,7 +107,6 @@ def create_webRTC_json(dic):
 
 def create_message(packet, handler):
     message_dic = packet["DATA"]
-    print(message_dic)
     if message_dic['messageType'] == 'chatMessage':
         message = create_chat_json(message_dic, handler) 
         return message

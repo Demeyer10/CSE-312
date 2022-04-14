@@ -8,6 +8,7 @@ user_collection = db["users"]
 user_collection_id = db["user_id"]
 image_collection_id = db["image_id"]
 chat_collection = db["chat"]
+live_chat_collection = db["livechat"]
 
 
 def get_new_id():
@@ -59,6 +60,13 @@ def save_upload(image, comment):
 
 def get_chat():
         chat_list = chat_collection.find({}, {"_id": 0})
+        return list(chat_list)
+
+def save_live_chat(username, message):
+        live_chat_collection.insert_one({"username": username, "comment": message["comment"]})
+
+def get_live_chat():
+        chat_list = live_chat_collection.find({}, {"_id": 0})
         return list(chat_list)
 
 
