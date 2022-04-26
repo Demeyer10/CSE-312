@@ -10,6 +10,8 @@
 <body onload="welcome();">
 
     <h1>CSE312 Sample Page</h1>
+    <h1>Weolcome: {{username}}</h1>
+    <h1>Times Visited: {{visit}}</h1>
 
     <p id="paragraph">
         This text is from the HTML file 🙂
@@ -23,27 +25,46 @@
 
     <br /><br />
 
+    <div class="rowContainer">
+        <div class="feedContainer">
+            <form class="postForm" action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
+                <label for="image-form-comment">Comment: </label>
+                </br>
+                <textarea placeholder="Have something on your mind...." class="chatInput" id="image-form-comment"
+                    name="comment" cols="40" rows="6"></textarea>
+                <input id="from-token" name="token" type="hidden" value="{{token}}">
+                <br />
+                <label for="form-file">Image: </label>
+                <input class="button" id="form-file" type="file" name="upload">
+                <input class="button" type="submit" value="Post">
+            </form>
 
-    <form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
-        <label for="image-form-comment">Comment: </label>
-        <textarea id="image-form-comment" name="comment" cols="40" rows="6"></textarea>
-        <input id="from-token" name="token" type="hidden" value="{{token}}">
-        <br />
-        <label for="form-file">Image: </label>
-        <input id="form-file" type="file" name="upload">
-        <input type="submit" value="Post">
-    </form>
+            Messages:
+            {{loop}}
+            <div style="width: 30%; flex-grow: 1; word-wrap: break-word;">
+                <hr />
+                <p><b>{{message}}</b><br />{{image_file}}</p>
+            </div>
+
+            {{end_loop}}
+        </div>
 
 
 
-    <br /><br />
-    <label for="chat-comment">Chat: </label>
-    <input id="chat-comment" type="text" name="comment">
+        <div class="chatContainer">
+            <label for="chat-comment">Chat: </label>
+            <div id="chat">
+            </div>
+            <div class="bottomBar">
+                <div class="rowContainer">
+                    <input placeholder="Send a message..." class="chatInput" id="chat-comment" type="text"
+                        name="comment"></input>
+                    <button class="button" id="liveChatButton" onclick="sendMessage()">Send</button>
+                </div>
+            </div>
+        </div>
 
-    <button onclick="sendMessage()">Send</button>
-
-    <div id="chat"></div>
-
+    </div>
     <br />
     <button onclick="startVideo()">Start My Video</button>
     <br />
@@ -56,14 +77,6 @@
 
 
     <br /><br />
-    Messages:
-    {{loop}}
-    <div style="width: 30%; flex-grow: 1; word-wrap: break-word;">
-        <hr />
-        <p><b>{{message}}</b><br />{{image_file}}</p>
-    </div>
-
-    {{end_loop}}
     <script src="functions.js"></script>
 </body>
 

@@ -1,10 +1,12 @@
 import json
 import os
 import secrets
+import bcrypt
 import database as db
-from responose import generate_response
+from responose import generate_response, generate_response_redirect
 from router import Route
 from template_engine import render_template, replace_placeholder
+
 
 def add_paths(router):
     # All allowed static paths (All other paths go to a 404 Error)
@@ -14,6 +16,12 @@ def add_paths(router):
     router.add_route(Route("GET", "/style.css", style))
     router.add_route(Route("GET", "/image/.", images))
     router.add_route(Route("GET", "/$", home))
+    router.add_route(Route("GET", "/login$", loginHome))
+    router.add_route(Route("GET", "/login.css", loginStyle))
+    router.add_route(Route("GET", "/signup$", signupHome))
+    router.add_route(Route("GET", "/Signup.css", signUpStyle))
+    router.add_route(Route("POST", '/register', register))
+    router.add_route(Route("POST", '/login', login))
     router.add_route(Route("POST", "/image-upload", upload))
    
 message = [{"message": "", "image_file": ""}]
@@ -23,9 +31,16 @@ tokens = []
 # Generate response based on the request
 def home(request, handler):
     chat_list = db.get_chat()
+    if not 'username' in request.cookies:
+         handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /login\r\n'.encode())
+    login_token = request.cookies["token"]
+    db_token = db.get_token_by_username(request.cookies["username"])[0]
+    if not bcrypt.checkpw(login_token.encode('utf-8'), db_token[request.cookies['username']].encode("utf-8")):
+        handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /login\r\n'.encode())
     if len(chat_list):
         upload_data = {"loop_data": chat_list}
         content = render_template("sample_page/index.html", upload_data)
+        content = content.replace("{{username}}", request.cookies["username"])
         token = secrets.token_urlsafe(20)
         tokens.append(token.encode())
         content = content.replace("{{token}}", token)
@@ -34,7 +49,12 @@ def home(request, handler):
         tokens.append(token.encode())
         content = render_template("sample_page/index.html", base_content)
         content = content.replace("{{token}}", token)
-    response = generate_response(content.encode(), "text/html; charset=utf-8", "200 OK")
+    if "visit" in request.cookies:
+        content = content.replace("{{visit}}", request.cookies["visit"])
+        response = generate_response(content.encode(), "text/html; charset=utf-8", "200 OK", ["visit"], [int(request.cookies["visit"])+1])
+    else:
+        content = content.replace("{{visit}}", "1")
+        response = generate_response(content.encode(), "text/html; charset=utf-8", "200 OK", ["visit"], [2])
     handler.request.sendall(response)
 
 def hello(request, handler):
@@ -79,6 +99,41 @@ def upload(request, handler):
     handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /\r\n'.encode())
 
 
+def loginHome(request, handler):
+    send_response('sample_page/login.html', 'text/html; charset=utf-8', request, handler)
+
+def loginStyle(request, handler):
+    send_response('sample_page/login.css', 'text/css; charset=utf-8', request, handler)
+
+def signupHome(request, handler):
+    send_response('sample_page/Signup.html', 'text/html; charset=utf-8', request, handler)
+
+def signUpStyle(request, handler):
+    send_response('sample_page/Signup.css', 'text/css; charset=utf-8', request, handler)
+
+def register(request, handler):
+    salt = bcrypt.gensalt()
+    hashed_password = bcrypt.hashpw(request.password, salt)
+    db.store_information(request.username, hashed_password)
+    handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /\r\n'.encode())
+
+def login(request, handler):
+    user = db.get_information_by_username(request.username)[0]
+    if user:
+        hashed_password = user[request.username.decode()]
+        password = request.password.decode().encode("utf-8")
+        if bcrypt.checkpw(password, hashed_password):
+            print("matched")
+            token = secrets.token_urlsafe(20)
+            response = generate_response_redirect(["token","username"], [token,request.username.decode()])
+            salt = bcrypt.gensalt()
+            token = bcrypt.hashpw(token.encode("utf-8"), salt)
+            db.store_token(request.username.decode(), token)
+            handler.request.sendall(response)
+        else:
+            print("no match") 
+    else:
+        print("user not found")
 
 # Creating Responses
 def send_response(filename, mime_type, request, handler):

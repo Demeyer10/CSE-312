@@ -9,6 +9,8 @@ user_collection_id = db["user_id"]
 image_collection_id = db["image_id"]
 chat_collection = db["chat"]
 live_chat_collection = db["livechat"]
+information_collection = db["information"]
+user_token_collection = db["tokens"]
 
 
 def get_new_id():
@@ -69,4 +71,20 @@ def get_live_chat():
         chat_list = live_chat_collection.find({}, {"_id": 0})
         return list(chat_list)
 
+def store_information(username, password):
+        information_collection.insert_one({username.decode(): password})
 
+def get_information_by_username(username):
+        user = information_collection.find({},{username.decode():1,"_id": 0})
+        return list(user)
+
+def store_token(username, token):
+        user = list(user_token_collection.find({},{username:1,"_id":0}))
+        if user:
+                user_token_collection.update_one({},{'$set':{username: token.decode()}})
+        else:        
+                user_token_collection.insert_one({username: token.decode()})
+
+def get_token_by_username(username):
+        user = user_token_collection.find({},{username:1,"_id":0})
+        return list(user)

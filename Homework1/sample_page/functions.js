@@ -23,7 +23,7 @@ function sendMessage() {
 // Renders a new chat message to the page
 function addMessage(chatMessage) {
     let chat = document.getElementById('chat');
-    chat.innerHTML += "<b>" + chatMessage['username'] + "</b>: " + chatMessage["comment"] + "<br/>";
+    chat.innerHTML += "<div class='row-Container'><b>" + chatMessage['username'] + ":</b> " + "<div class='chatMessage'>" + chatMessage["comment"] + "</div></div>" + "<br/>";
 }
 
 // called when the page loads to get the chat_history

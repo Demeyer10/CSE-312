@@ -1,3 +1,5 @@
+
+
 class Request:
     new_line = b'\r\n'
     boundary_line = b'\r\n\r\n'
@@ -6,10 +8,13 @@ class Request:
         [request_line, header_as_bytes, self.body] = split_request(request)
         [self.method, self.path, self.http] = parse_request_line(request_line)
         self.headers = parse_headers(header_as_bytes)
+        self.cookies = {}
+        if "Cookie" in self.headers:
+            self.cookies = parse_cookies(self.headers)
         if "Content-Type" in self.headers:
             self.boundary = parse_boundary(self.headers)
+            [self.username, self.password] = parse_login_information(self.boundary, self.body)
             [self.comment, self.upload, self.token] = parse_additional_content(self.boundary, self.body)
-            print(self.token)
 
 def split_request(request: bytes):
     new_line_boundary = request.find(Request.new_line)
@@ -56,3 +61,27 @@ def parse_additional_content(boundary: bytes, body: bytes):
         elif headers["Content-Disposition"].split(';')[1].split("=")[1] == '"token"':
             token = content_body
     return [comment[:-2:], upload[:-2:], token[:-2:]]
+
+
+def parse_login_information(boundary: bytes, body: bytes):
+    content = body.split(boundary)
+    username = b''
+    password = b''
+    for i in range(1,len(content)-1):
+        [request_line, headers, content_body] = split_request(content[i])
+        headers = parse_headers(headers)
+        if headers["Content-Disposition"].split(';')[1].split("=")[1] == '"username"':
+            username = content_body
+        elif headers["Content-Disposition"].split(';')[1].split("=")[1] == '"password"':
+            password = content_body
+    return [username[:-2:],password[:-2:]]
+
+
+def parse_cookies(header):
+    cookies = header["Cookie"].split(";")
+    cookie_dic = {}
+    for cookie in cookies:
+        cookie = cookie.split("=")
+        cookie[0] = cookie[0].strip(" ")
+        cookie_dic[cookie[0]] = cookie[1]
+    return cookie_dic

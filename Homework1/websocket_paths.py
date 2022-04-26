@@ -46,9 +46,13 @@ def run_connection(request, handler):
                 packet["DATA"] = decode_data(packet["DATA"])
             else:
                 packet["DATA"] = decode_data(packet["DATA"])
-            db.save_live_chat(handler.websocket_connection[handler], packet["DATA"])
-            for users in handler.websocket_connection.keys():
-                users.request.sendall(build_frame_packet(packet, handler))
+            if packet["DATA"]["messageType"] == "chatMessage":
+                db.save_live_chat(handler.websocket_connection[handler], packet["DATA"])
+                final_packet = build_frame_packet(packet, handler)
+                for users in handler.websocket_connection.keys():
+                    print(final_packet)
+                    users.request.sendall(final_packet)
+            
 
 def compute_websocket_key(key):
     key += "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
@@ -58,7 +62,14 @@ def compute_websocket_key(key):
 
 def chatHistory(request, handler):
     live_chat = db.get_live_chat()
-    response = generate_response(json.dumps(live_chat).encode(), "application/json", "200 OK")
+    for chat in live_chat:
+        chat["comment"] = chat["comment"].encode()
+        chat["comment"] = chat["comment"].replace(b'&', b'&amp;')
+        chat["comment"] = chat["comment"].replace(b'>', b'&gt;')
+        chat["comment"] = chat["comment"].replace(b'<', b'&lt;')
+        chat["comment"] = chat["comment"].decode()
+    livechat_json = json.dumps(live_chat).encode()
+    response = generate_response(livechat_json, "application/json", "200 OK")
     handler.request.sendall(response)
     
     

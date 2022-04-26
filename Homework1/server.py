@@ -32,6 +32,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
                 received_data += buffer(int(request.headers["Content-Length"])-len(request.body), self)
             sys.stdout.flush()
             sys.stderr.flush()
+            #print(received_data.decode())
             request = Request(received_data)
             self.router.handle_request(request, self)
     
