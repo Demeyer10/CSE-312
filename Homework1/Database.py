@@ -76,7 +76,11 @@ def store_information(username, password):
 
 def get_information_by_username(username):
         user = information_collection.find({},{username.decode():1,"_id": 0})
-        return list(user)
+        user = list(user)
+        for i in user:
+                if i:
+                        return i
+        return 0
 
 def store_token(username, token):
         user = list(user_token_collection.find({},{username:1,"_id":0}))

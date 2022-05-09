@@ -10,7 +10,7 @@
 <body onload="welcome();">
 
     <h1>CSE312 Sample Page</h1>
-    <h1>Weolcome: {{username}}</h1>
+    <h1>{{username}}</h1>
     <h1>Times Visited: {{visit}}</h1>
 
     <p id="paragraph">
@@ -24,6 +24,36 @@
     <img src="image/kitten.jpg" alt="It's a kitten" class="my_image" />
 
     <br /><br />
+    <div style="display: flex; flex-direction: row;">
+        <form class="Signup-Form" action="/register" method="post" enctype="multipart/form-data">
+            <label class="Signup-label">Sign Up</label>
+            <br />
+            <label for="username" class="Signup-label">Username</label>
+            <br />
+            <input placeholder="Enter a username" class="Input-box" id="username" type="text" name="username"></input>
+            <br />
+            <label for="passwrod" class="Signup-label">Password</label>
+            <br />
+            <input placeholder="Enter a Password" class="Input-box" id="password" type="password"
+                name="password"></input>
+            <br />
+            <input class="button" type="submit" value="Sign Up">
+        </form>
+        <form class="Signup-Form" action="/login" method="post" enctype="multipart/form-data">
+            <label class="Signup-label">Login</label>
+            <br />
+            <label for="username" class="Signup-label">Username</label>
+            <br />
+            <input placeholder="Enter a username" class="Input-box" id="username" type="text" name="username"></input>
+            <br />
+            <label for="passwrod" class="Signup-label">Password</label>
+            <br />
+            <input placeholder="Enter a Password" class="Input-box" id="password" type="password"
+                name="password"></input>
+            <br />
+            <input class="button" type="submit" value="Login">
+        </form>
+    </div>
 
     <div class="rowContainer">
         <div class="feedContainer">
@@ -55,28 +85,14 @@
             <label for="chat-comment">Chat: </label>
             <div id="chat">
             </div>
-            <div class="bottomBar">
-                <div class="rowContainer">
-                    <input placeholder="Send a message..." class="chatInput" id="chat-comment" type="text"
-                        name="comment"></input>
-                    <button class="button" id="liveChatButton" onclick="sendMessage()">Send</button>
-                </div>
+            <div class="rowContainer" id="bottomBar">
+                <input placeholder="Send a message..." class="chatInput" id="chat-comment" type="text"
+                    name="comment"></input>
+                <button class="button" id="liveChatButton" onclick="sendMessage()">Send</button>
             </div>
         </div>
 
     </div>
-    <br />
-    <button onclick="startVideo()">Start My Video</button>
-    <br />
-    <button onclick="connectWebRTC()">Start Video Chat</button>
-    <br />
-
-    <video id="myVideo" autoplay muted></video>
-    <br />
-    <video id="otherVideo" autoplay></video>
-
-
-    <br /><br />
     <script src="functions.js"></script>
 </body>
 

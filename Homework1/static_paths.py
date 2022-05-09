@@ -31,16 +31,22 @@ tokens = []
 # Generate response based on the request
 def home(request, handler):
     chat_list = db.get_chat()
-    if not 'username' in request.cookies:
-         handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /login\r\n'.encode())
-    login_token = request.cookies["token"]
-    db_token = db.get_token_by_username(request.cookies["username"])[0]
-    if not bcrypt.checkpw(login_token.encode('utf-8'), db_token[request.cookies['username']].encode("utf-8")):
-        handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /login\r\n'.encode())
+    cookieId = []
+    cookieVal = []
     if len(chat_list):
         upload_data = {"loop_data": chat_list}
         content = render_template("sample_page/index.html", upload_data)
-        content = content.replace("{{username}}", request.cookies["username"])
+        if 'username' in request.cookies:
+                login_token = request.cookies["token"]
+                db_token = db.get_token_by_username(request.cookies["username"])[0]
+                if bcrypt.checkpw(login_token.encode('utf-8'), db_token[request.cookies['username']].encode("utf-8")):
+                    content = content.replace("{{username}}", "Welcome: " + request.cookies["username"])
+                    cookieId.append('username')
+                    cookieId.append('token')
+                    cookieVal.append(request.cookies["username"])
+                    cookieVal.append(login_token)
+        else:
+            content = content.replace("{{username}}", "Welcome: ")
         token = secrets.token_urlsafe(20)
         tokens.append(token.encode())
         content = content.replace("{{token}}", token)
@@ -51,10 +57,14 @@ def home(request, handler):
         content = content.replace("{{token}}", token)
     if "visit" in request.cookies:
         content = content.replace("{{visit}}", request.cookies["visit"])
-        response = generate_response(content.encode(), "text/html; charset=utf-8", "200 OK", ["visit"], [int(request.cookies["visit"])+1])
+        cookieId.append('visit')
+        cookieVal.append(int(request.cookies["visit"])+1)
+        response = generate_response(content.encode(), "text/html; charset=utf-8", "200 OK", cookieId, cookieVal)
     else:
         content = content.replace("{{visit}}", "1")
-        response = generate_response(content.encode(), "text/html; charset=utf-8", "200 OK", ["visit"], [2])
+        cookieId.append('visit')
+        cookieVal.append(2)
+        response = generate_response(content.encode(), "text/html; charset=utf-8", "200 OK", cookieId, cookieVal)
     handler.request.sendall(response)
 
 def hello(request, handler):
@@ -118,12 +128,13 @@ def register(request, handler):
     handler.request.sendall('HTTP/1.1 301 OK\r\nContent-Length: 0\r\nLocation: /\r\n'.encode())
 
 def login(request, handler):
-    user = db.get_information_by_username(request.username)[0]
+    print(request.username)
+    user = db.get_information_by_username(request.username)
+    print(user)
     if user:
         hashed_password = user[request.username.decode()]
         password = request.password.decode().encode("utf-8")
         if bcrypt.checkpw(password, hashed_password):
-            print("matched")
             token = secrets.token_urlsafe(20)
             response = generate_response_redirect(["token","username"], [token,request.username.decode()])
             salt = bcrypt.gensalt()
@@ -131,9 +142,11 @@ def login(request, handler):
             db.store_token(request.username.decode(), token)
             handler.request.sendall(response)
         else:
-            print("no match") 
+            response = generate_response_redirect([],[])
+            handler.request.sendall(response)
     else:
-        print("user not found")
+        response = generate_response_redirect([],[])
+        handler.request.sendall(response)
 
 # Creating Responses
 def send_response(filename, mime_type, request, handler):
